@@ -2,7 +2,10 @@
 
 Plantilla minimalista para un **sitio personal** (notas, reseñas y proyectos),
 construida con [Astro](https://astro.build) y pensada para publicarse **gratis**
-en GitHub Pages. Sin base de datos, sin backend y **sin dependencias de pago**.
+en cualquier hosting estático (Cloudflare Pages, Netlify o GitHub Pages). Sin base
+de datos, sin backend y **sin dependencias de pago**.
+
+**🔗 Demo en vivo:** https://resoluble-astro-theme.jorgee-abud.workers.dev/
 
 Estética de terminal: header con breadcrumb `~/ruta`, menú lateral colapsable,
 tema claro/oscuro y contenido en Markdown. Toda la configuración de marca vive en
