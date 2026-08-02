@@ -12,7 +12,7 @@ export const site = {
    * Lo que se muestra arriba a la izquierda (enlace al inicio). Puede ser un
    * símbolo como '~' (estilo terminal) o el nombre del sitio. Ej.: site.name.
    */
-  homeLabel: '~',
+  homeLabel: 'home',
   /** Nombre completo del autor. */
   author: 'Tu Nombre',
   /** Nombre corto del autor (para descripciones, RSS, etc.). */
