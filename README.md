@@ -58,19 +58,74 @@ copia un archivo existente y edita su bloque de _frontmatter_.
 Los esquemas exactos están en
 [`src/content.config.ts`](src/content.config.ts).
 
-## Publicar en GitHub Pages (gratis)
+## Publicar el sitio (gratis)
 
-1. Sube tu repo a GitHub.
-2. En **Settings → Pages → Build and deployment**, elige **Source: “GitHub
-   Actions”**.
-3. Ajusta `url` en `src/site.config.ts` a tu dominio de Pages
-   (ej. `https://tu-usuario.github.io`).
-4. Haz `push` a `main` (o `master`): el workflow
-   [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) compila y
-   publica el sitio.
+Este template genera un sitio **estático** (la carpeta `dist/`), así que puedes
+publicarlo gratis en cualquiera de estos servicios. Los tres se conectan a tu
+repo de GitHub y **se actualizan solos** en cada `git push`. Antes de publicar,
+ajusta `url` en `src/site.config.ts` a tu dominio final.
 
-> Si publicas en `https://tu-usuario.github.io/tu-repo/` (no en la raíz),
-> agrega también `base: '/tu-repo'` en `astro.config.mjs`.
+### Opción 1 — Cloudflare Pages
+
+1. Entra a [dash.cloudflare.com](https://dash.cloudflare.com) → **Workers &
+   Pages** → **Create** → pestaña **Pages** → **Connect to Git**.
+2. Elige tu repo. En **Build settings** (a veces bajo *Advanced settings*):
+   - Framework preset: **Astro**
+   - Build command: `npm run build`
+   - Output directory: `dist`
+3. **Save and Deploy**. Te da una URL tipo `tu-sitio.pages.dev`.
+
+### Opción 2 — Netlify
+
+1. Entra a [app.netlify.com](https://app.netlify.com) → **Add new site** →
+   **Import an existing project** → **GitHub**.
+2. Elige tu repo (detecta Astro automáticamente: `npm run build` → `dist`).
+3. **Deploy**. Te da una URL tipo `tu-sitio.netlify.app`.
+
+### Opción 3 — GitHub Pages
+
+GitHub Pages necesita un pequeño *workflow* de GitHub Actions. Crea el archivo
+`.github/workflows/deploy.yml` con esto:
+
+```yaml
+name: Deploy to GitHub Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: withastro/action@v3
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+```
+
+Luego, en tu repo: **Settings → Pages → Build and deployment → Source: “GitHub
+Actions”**. Con eso, cada `push` a `main` publica el sitio.
+
+> **Importante (sobre `base`):** si tu repo **no** se llama exactamente
+> `tu-usuario.github.io` — es decir, tu sitio vive en una subcarpeta como
+> `tu-usuario.github.io/mi-repo/` — los enlaces internos se romperían. En ese
+> caso agrega `base: '/mi-repo'` en `astro.config.mjs`. Si es tu sitio de raíz
+> (`tu-usuario.github.io`), no necesitas `base`. Cloudflare y Netlify no tienen
+> este detalle porque sirven en la raíz.
 
 ## Stack
 
@@ -80,7 +135,7 @@ Los esquemas exactos están en
 | Content Collections | Markdown tipado (`notas`, `resenas`, `projects`). |
 | [@astrojs/sitemap](https://docs.astro.build/en/guides/integrations-guide/sitemap/) · [@astrojs/rss](https://docs.astro.build/en/guides/rss/) | Sitemap y feed RSS de las notas. |
 | CSS plano | Un solo `src/styles/global.css` con variables de tema. Sin Tailwind. |
-| GitHub Actions + Pages | Build y deploy automáticos. |
+| Hosting estático | Se publica gratis en Cloudflare Pages, Netlify o GitHub Pages (ver arriba). |
 
 Requiere **Node.js 20+**.
 
